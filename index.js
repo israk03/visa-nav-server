@@ -31,9 +31,12 @@ async function run() {
       "Pinged your deployment. You successfully connected to MongoDB!"
     );
 
-    app.get("/", (req, res) => {
-      res.send("Hello from server");
-    });
+    // collections
+    const usersCollection = client.db("visaNav").collection("users");
+    const visasCollection = client.db("visaNav").collection("visas");
+    const applicationsCollection = client
+      .db("visaNav")
+      .collection("applications");
   } finally {
     // await client.close();
   }
