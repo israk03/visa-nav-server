@@ -37,6 +37,32 @@ async function run() {
     const applicationsCollection = client
       .db("visaNav")
       .collection("applications");
+
+    //--------------->>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> users api
+    // Get All Users
+    app.get("/users", async (req, res) => {
+      const users = await usersCollection.find().toArray();
+      res.json(users);
+    });
+
+    // Register User
+    app.post("/register", async (req, res) => {
+      const { name, email, photoURL } = req.body;
+      const existingUser = await usersCollection.findOne({ email });
+      if (existingUser)
+        return res.status(400).json({ message: "User already exists" });
+
+      const newUser = { name, email, photoURL, createdAt: new Date() };
+      const result = await usersCollection.insertOne(newUser);
+      res.json(result);
+    });
+
+    // Get User by Email
+    app.get("/users/:email", async (req, res) => {
+      const email = req.params.email;
+      const user = await usersCollection.findOne({ email });
+      res.json(user);
+    });
   } finally {
     // await client.close();
   }
