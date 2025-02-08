@@ -1,7 +1,7 @@
 const express = require("express");
 const cors = require("cors");
 const port = process.env.PORT || 3000;
-const { MongoClient, ServerApiVersion } = require("mongodb");
+const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 
 const app = express();
 
@@ -71,6 +71,22 @@ async function run() {
       res.json(visas);
     });
 
+    app.get("/latest-visas", async (req, res) => {
+      const latestVisas = await visasCollection
+        .find()
+        .sort({ createdAt: -1 })
+        .limit(6)
+        .toArray();
+      res.json(latestVisas);
+    });
+
+    // Get visas added by the logged-in user
+    app.get("/my-visas/:email", async (req, res) => {
+      const email = req.params.email;
+      const visas = await visasCollection.find({ createdBy: email }).toArray();
+      res.json(visas);
+    });
+
     // Add a New Visa
     app.post("/add-visa", async (req, res) => {
       const visa = req.body;
@@ -120,7 +136,17 @@ async function run() {
       const applications = await applicationsCollection
         .find({ email })
         .toArray();
-      res.json(applications);
+
+      // Ensure every application object has `countryName`
+      const processedApplications = applications.map((app) => ({
+        ...app,
+        countryName: app.countryName || "Unknown Country",
+        visaType: app.visaType || "N/A",
+        status: app.status || "Pending",
+        appliedAt: app.appliedAt || "N/A",
+      }));
+
+      res.json(processedApplications);
     });
 
     // Cancel Visa Application
