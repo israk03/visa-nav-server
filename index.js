@@ -1,3 +1,4 @@
+require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
 const port = process.env.PORT || 3000;
@@ -8,11 +9,7 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// gCnG8NsOuY46BkPP
-// visa-nav
-
-const uri =
-  "mongodb+srv://visa-nav:gCnG8NsOuY46BkPP@cluster0.e3qys.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0";
+const uri = process.env.MONGO_URI;
 
 // Create a MongoClient with a MongoClientOptions object to set the Stable API version
 const client = new MongoClient(uri, {
