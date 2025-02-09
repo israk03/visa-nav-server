@@ -133,20 +133,14 @@ async function run() {
     // Get All Applications for a User
     app.get("/applications/:email", async (req, res) => {
       const email = req.params.email;
-      const applications = await applicationsCollection
-        .find({ email })
-        .toArray();
-
-      // Ensure every application object has `countryName`
-      const processedApplications = applications.map((app) => ({
-        ...app,
-        countryName: app.countryName || "Unknown Country",
-        visaType: app.visaType || "N/A",
-        status: app.status || "Pending",
-        appliedAt: app.appliedAt || "N/A",
-      }));
-
-      res.json(processedApplications);
+      try {
+        const applications = await applicationsCollection
+          .find({ email })
+          .toArray();
+        res.json(applications);
+      } catch (error) {
+        res.status(500).json({ error: "Failed to fetch applications" });
+      }
     });
 
     // Cancel Visa Application
